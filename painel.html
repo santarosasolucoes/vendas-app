@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2E2116">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Empório RD">
+<title>Empório RD — Painel</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="aviso-offline" id="aviso-offline">Sem conexão — suas ações serão sincronizadas quando a internet voltar.</div>
+<header class="topo">
+  <img class="logo" src="./icons/logo-header.png" alt="Empório RD">
+  <div>
+    <h1 id="nome-marca">Empório RD</h1>
+    <p>Painel de vendas</p>
+  </div>
+</header>
+<main>
+  <nav class="abas">
+    <button data-aba="pedido" class="ativa">Novo Pedido</button>
+    <button data-aba="pedidos">Pedidos</button>
+    <button data-aba="vendas">Vendas</button>
+    <button data-aba="compras">Compras</button>
+    <button data-aba="cadastros">Cadastros</button>
+  </nav>
+
+  <!-- ABA: NOVO PEDIDO -->
+  <section id="aba-pedido">
+    <div class="cartao">
+      <label>Cliente</label>
+      <select id="select-cliente"></select>
+
+      <label>Produto</label>
+      <select id="select-produto"></select>
+      <label>Quantidade</label>
+      <input type="number" id="input-quantidade" value="1" min="1" step="1">
+      <button id="btn-add-item">Adicionar ao pedido</button>
+    </div>
+
+    <div class="cartao">
+      <div id="lista-carrinho"></div>
+      <div class="total-pedido" id="total-carrinho">Total: R$ 0,00</div>
+      <button id="btn-criar-pedido" style="margin-top:10px;">Criar pedido e gerar mensagem</button>
+    </div>
+
+    <div class="cartao" id="resultado-pedido" style="display:none;">
+      <p><strong>Pedido criado!</strong> Envie a confirmação para o cliente:</p>
+      <textarea class="texto-whatsapp" id="texto-confirmacao" readonly></textarea>
+      <button id="btn-abrir-whatsapp-confirmacao" class="secundario">Abrir no WhatsApp</button>
+    </div>
+  </section>
+
+  <!-- ABA: PEDIDOS AGUARDANDO CONFIRMAÇÃO -->
+  <section id="aba-pedidos" style="display:none;">
+    <div class="cartao">
+      <p>Pedidos aguardando confirmação do cliente pelo WhatsApp. Quando o cliente confirmar (fora do app), marque aqui.</p>
+    </div>
+    <div id="lista-pedidos"></div>
+  </section>
+
+  <!-- ABA: VENDAS / COBRANÇA -->
+  <section id="aba-vendas" style="display:none;">
+    <div class="cartao" id="painel-lucratividade"></div>
+    <div id="lista-vendas"></div>
+  </section>
+
+  <!-- ABA: COMPRAS (pedido à fábrica/fornecedor) -->
+  <section id="aba-compras" style="display:none;">
+    <div class="cartao">
+      <label>Fornecedor</label>
+      <select id="select-fornecedor"></select>
+
+      <label>Produto</label>
+      <select id="select-produto-compra"></select>
+      <label>Quantidade</label>
+      <input type="number" id="input-quantidade-compra" value="1" min="1" step="0.001">
+      <button id="btn-add-item-compra">Adicionar ao pedido de compra</button>
+    </div>
+
+    <div class="cartao">
+      <div id="lista-carrinho-compra"></div>
+      <div class="total-pedido" id="total-carrinho-compra">Total estimado: R$ 0,00</div>
+      <label>Data prevista de retirada</label>
+      <input type="date" id="data-retirada-prevista">
+      <button id="btn-criar-pedido-compra" style="margin-top:6px;">Criar pedido e gerar mensagem</button>
+    </div>
+
+    <div class="cartao" id="resultado-pedido-compra" style="display:none;">
+      <p><strong>Pedido de compra criado!</strong> Envie para o fornecedor:</p>
+      <textarea class="texto-whatsapp" id="texto-pedido-compra" readonly></textarea>
+      <button id="btn-abrir-whatsapp-compra" class="secundario">Abrir no WhatsApp</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Pedidos enviados, aguardando retirada</h3>
+      <div id="lista-pedidos-compra"></div>
+    </div>
+  </section>
+
+  <!-- ABA: CADASTROS -->
+  <section id="aba-cadastros" style="display:none;">
+    <div class="cartao">
+      <h3>Produto</h3>
+      <input type="hidden" id="prod-id">
+      <label>Nome</label><input id="prod-nome">
+      <label>Categoria</label><input id="prod-categoria">
+      <label>Foto (URL)</label><input id="prod-foto">
+      <label>Unidade de compra (ex.: kg)</label><input id="prod-unid-compra">
+      <label>Custo por unidade de compra</label><input type="number" id="prod-custo-compra" step="0.01">
+      <label>Unidade de venda (ex.: pacote, unidade)</label><input id="prod-unid-venda">
+      <label>Fator de conversão (ex.: pacote de 0,25 kg → 0.25)</label><input type="number" id="prod-fator" step="0.001" value="1">
+      <label>Preço de venda</label><input type="number" id="prod-preco-venda" step="0.01">
+      <label>Estoque atual</label><input type="number" id="prod-estoque" step="1">
+      <label>Estoque mínimo</label><input type="number" id="prod-estoque-min" step="1">
+      <label>Validade</label><input type="date" id="prod-validade">
+      <button id="btn-salvar-produto">Salvar produto</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Cliente</h3>
+      <input type="hidden" id="cli-id">
+      <label>Nome</label><input id="cli-nome">
+      <label>WhatsApp (com DDD)</label><input id="cli-whatsapp">
+      <label>Endereço</label><input id="cli-endereco">
+      <button id="btn-salvar-cliente">Salvar cliente</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Fornecedor</h3>
+      <input type="hidden" id="forn-id">
+      <label>Nome da fábrica</label><input id="forn-nome">
+      <label>WhatsApp</label><input id="forn-whatsapp">
+      <label>Cidade</label><input id="forn-cidade">
+      <button id="btn-salvar-fornecedor">Salvar fornecedor</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Produtos com estoque baixo</h3>
+      <div id="lista-estoque-baixo"></div>
+    </div>
+  </section>
+</main>
+
+<script src="./config.js"></script>
+<script src="./idb-queue.js"></script>
+<script src="./api.js"></script>
+<script src="./painel.js"></script>
+</body>
+</html>
