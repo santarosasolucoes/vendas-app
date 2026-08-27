@@ -72,14 +72,20 @@ async function carregarDadosPedido() {
   selectCliente.innerHTML = CLIENTES_CACHE.map((c) => `<option value="${c.id_cliente}">${c.nome_cliente}</option>`).join('');
 
   const selectProduto = document.getElementById('select-produto');
-  selectProduto.innerHTML = PRODUTOS_CACHE
+  selectProduto.innerHTML = '<option value="">— Selecione um produto —</option>' + PRODUTOS_CACHE
     .map((p) => `<option value="${p.id_produto}">${p.nome_produto} (${formatarMoedaLocal(p.preco_venda)})${Number(p.qtd_estoque) <= 0 ? ' — sob encomenda' : ''}</option>`)
     .join('');
+}
+
+function limparSelecaoItemPedido() {
+  document.getElementById('select-produto').value = '';
+  document.getElementById('input-quantidade').value = '1';
 }
 
 document.getElementById('btn-add-item').addEventListener('click', () => {
   const idProduto = document.getElementById('select-produto').value;
   const quantidade = Number(document.getElementById('input-quantidade').value) || 1;
+  if (!idProduto) return alert('Selecione um produto.');
   const produto = PRODUTOS_CACHE.find((p) => p.id_produto === idProduto);
   if (!produto) return;
 
@@ -88,6 +94,7 @@ document.getElementById('btn-add-item').addEventListener('click', () => {
   else CARRINHO.push({ id_produto: idProduto, nome_produto: produto.nome_produto, quantidade, preco_venda: Number(produto.preco_venda) });
 
   renderCarrinho();
+  limparSelecaoItemPedido();
 });
 
 function renderCarrinho() {
