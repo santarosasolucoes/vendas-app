@@ -108,7 +108,10 @@
   <!-- ABA: CADASTROS -->
   <section id="aba-cadastros" style="display:none;">
     <div class="cartao">
-      <h3>Produto</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="titulo-form-produto">Novo produto</h3>
+        <button type="button" id="btn-novo-produto" class="secundario" style="min-height:36px; padding:6px 12px;">Novo</button>
+      </div>
       <input type="hidden" id="prod-id">
       <label>Nome</label><input id="prod-nome">
       <label>Categoria</label><input id="prod-categoria">
@@ -125,7 +128,15 @@
     </div>
 
     <div class="cartao">
-      <h3>Cliente</h3>
+      <h3>Produtos cadastrados</h3>
+      <div id="lista-produtos-cadastrados"></div>
+    </div>
+
+    <div class="cartao">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="titulo-form-cliente">Novo cliente</h3>
+        <button type="button" id="btn-novo-cliente" class="secundario" style="min-height:36px; padding:6px 12px;">Novo</button>
+      </div>
       <input type="hidden" id="cli-id">
       <label>Nome</label><input id="cli-nome">
       <label>WhatsApp (com DDD)</label><input id="cli-whatsapp">
@@ -134,12 +145,25 @@
     </div>
 
     <div class="cartao">
-      <h3>Fornecedor</h3>
+      <h3>Clientes cadastrados</h3>
+      <div id="lista-clientes-cadastrados"></div>
+    </div>
+
+    <div class="cartao">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="titulo-form-fornecedor">Novo fornecedor</h3>
+        <button type="button" id="btn-novo-fornecedor" class="secundario" style="min-height:36px; padding:6px 12px;">Novo</button>
+      </div>
       <input type="hidden" id="forn-id">
       <label>Nome da fábrica</label><input id="forn-nome">
       <label>WhatsApp</label><input id="forn-whatsapp">
       <label>Cidade</label><input id="forn-cidade">
       <button id="btn-salvar-fornecedor">Salvar fornecedor</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Fornecedores cadastrados</h3>
+      <div id="lista-fornecedores-cadastrados"></div>
     </div>
 
     <div class="cartao">

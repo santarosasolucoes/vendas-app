@@ -44,7 +44,7 @@ document.querySelectorAll('nav.abas button').forEach((btn) => {
     if (btn.dataset.aba === 'pedidos') carregarPedidos();
     if (btn.dataset.aba === 'vendas') carregarVendas();
     if (btn.dataset.aba === 'compras') carregarDadosCompra();
-    if (btn.dataset.aba === 'cadastros') carregarEstoqueBaixo();
+    if (btn.dataset.aba === 'cadastros') carregarCadastros();
   });
 });
 
@@ -381,6 +381,66 @@ function nomeFornecedorLocal(idFornecedor) {
 // =====================================================
 // CADASTROS
 // =====================================================
+function formatarDataParaInput(valor) {
+  return valor ? String(valor).slice(0, 10) : '';
+}
+
+// --- Produto ---
+function limparFormularioProduto() {
+  document.getElementById('prod-id').value = '';
+  document.getElementById('prod-nome').value = '';
+  document.getElementById('prod-categoria').value = '';
+  document.getElementById('prod-foto').value = '';
+  document.getElementById('prod-unid-compra').value = '';
+  document.getElementById('prod-custo-compra').value = '';
+  document.getElementById('prod-unid-venda').value = '';
+  document.getElementById('prod-fator').value = '1';
+  document.getElementById('prod-preco-venda').value = '';
+  document.getElementById('prod-estoque').value = '';
+  document.getElementById('prod-estoque-min').value = '';
+  document.getElementById('prod-validade').value = '';
+  document.getElementById('titulo-form-produto').textContent = 'Novo produto';
+}
+
+function preencherFormularioProduto(p) {
+  document.getElementById('prod-id').value = p.id_produto;
+  document.getElementById('prod-nome').value = p.nome_produto || '';
+  document.getElementById('prod-categoria').value = p.categoria || '';
+  document.getElementById('prod-foto').value = p.foto_url || '';
+  document.getElementById('prod-unid-compra').value = p.unidade_compra || '';
+  document.getElementById('prod-custo-compra').value = p.preco_custo_unidade_compra || '';
+  document.getElementById('prod-unid-venda').value = p.unidade_venda || '';
+  document.getElementById('prod-fator').value = p.fator_conversao || '1';
+  document.getElementById('prod-preco-venda').value = p.preco_venda || '';
+  document.getElementById('prod-estoque').value = p.qtd_estoque || '';
+  document.getElementById('prod-estoque-min').value = p.estoque_minimo || '';
+  document.getElementById('prod-validade').value = formatarDataParaInput(p.data_validade);
+  document.getElementById('titulo-form-produto').textContent = 'Editar produto';
+  document.getElementById('titulo-form-produto').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderListaProdutosCadastrados() {
+  const lista = document.getElementById('lista-produtos-cadastrados');
+  lista.innerHTML = PRODUTOS_CACHE.length
+    ? PRODUTOS_CACHE.map((p) => `
+      <div class="linha-item">
+        <span>${p.nome_produto} — ${formatarMoedaLocal(p.preco_venda)} (${p.qtd_estoque} em estoque)</span>
+        <a href="#" data-id="${p.id_produto}" class="editar-produto" style="color:var(--cobre);">editar</a>
+      </div>
+    `).join('')
+    : '<p>Nenhum produto cadastrado ainda.</p>';
+
+  lista.querySelectorAll('.editar-produto').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const produto = PRODUTOS_CACHE.find((p) => p.id_produto === a.dataset.id);
+      if (produto) preencherFormularioProduto(produto);
+    });
+  });
+}
+
+document.getElementById('btn-novo-produto').addEventListener('click', limparFormularioProduto);
+
 document.getElementById('btn-salvar-produto').addEventListener('click', async () => {
   const dados = {
     id_produto: document.getElementById('prod-id').value || undefined,
@@ -398,8 +458,50 @@ document.getElementById('btn-salvar-produto').addEventListener('click', async ()
   };
   await apiCall('upsertProduto', dados);
   alert('Produto salvo!');
+  limparFormularioProduto();
   carregarDadosPedido();
+  carregarCadastros();
 });
+
+// --- Cliente ---
+function limparFormularioCliente() {
+  document.getElementById('cli-id').value = '';
+  document.getElementById('cli-nome').value = '';
+  document.getElementById('cli-whatsapp').value = '';
+  document.getElementById('cli-endereco').value = '';
+  document.getElementById('titulo-form-cliente').textContent = 'Novo cliente';
+}
+
+function preencherFormularioCliente(c) {
+  document.getElementById('cli-id').value = c.id_cliente;
+  document.getElementById('cli-nome').value = c.nome_cliente || '';
+  document.getElementById('cli-whatsapp').value = c.telefone_whatsapp || '';
+  document.getElementById('cli-endereco').value = c.endereco || '';
+  document.getElementById('titulo-form-cliente').textContent = 'Editar cliente';
+  document.getElementById('titulo-form-cliente').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderListaClientesCadastrados() {
+  const lista = document.getElementById('lista-clientes-cadastrados');
+  lista.innerHTML = CLIENTES_CACHE.length
+    ? CLIENTES_CACHE.map((c) => `
+      <div class="linha-item">
+        <span>${c.nome_cliente} — ${c.telefone_whatsapp || 'sem WhatsApp'}</span>
+        <a href="#" data-id="${c.id_cliente}" class="editar-cliente" style="color:var(--cobre);">editar</a>
+      </div>
+    `).join('')
+    : '<p>Nenhum cliente cadastrado ainda.</p>';
+
+  lista.querySelectorAll('.editar-cliente').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cliente = CLIENTES_CACHE.find((c) => c.id_cliente === a.dataset.id);
+      if (cliente) preencherFormularioCliente(cliente);
+    });
+  });
+}
+
+document.getElementById('btn-novo-cliente').addEventListener('click', limparFormularioCliente);
 
 document.getElementById('btn-salvar-cliente').addEventListener('click', async () => {
   const dados = {
@@ -410,8 +512,50 @@ document.getElementById('btn-salvar-cliente').addEventListener('click', async ()
   };
   await apiCall('upsertCliente', dados);
   alert('Cliente salvo!');
+  limparFormularioCliente();
   carregarDadosPedido();
+  carregarCadastros();
 });
+
+// --- Fornecedor ---
+function limparFormularioFornecedor() {
+  document.getElementById('forn-id').value = '';
+  document.getElementById('forn-nome').value = '';
+  document.getElementById('forn-whatsapp').value = '';
+  document.getElementById('forn-cidade').value = '';
+  document.getElementById('titulo-form-fornecedor').textContent = 'Novo fornecedor';
+}
+
+function preencherFormularioFornecedor(f) {
+  document.getElementById('forn-id').value = f.id_fornecedor;
+  document.getElementById('forn-nome').value = f.nome_fabrica || '';
+  document.getElementById('forn-whatsapp').value = f.contato_whatsapp || '';
+  document.getElementById('forn-cidade').value = f.cidade || '';
+  document.getElementById('titulo-form-fornecedor').textContent = 'Editar fornecedor';
+  document.getElementById('titulo-form-fornecedor').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderListaFornecedoresCadastrados() {
+  const lista = document.getElementById('lista-fornecedores-cadastrados');
+  lista.innerHTML = FORNECEDORES_CACHE.length
+    ? FORNECEDORES_CACHE.map((f) => `
+      <div class="linha-item">
+        <span>${f.nome_fabrica} — ${f.cidade || 'sem cidade'}</span>
+        <a href="#" data-id="${f.id_fornecedor}" class="editar-fornecedor" style="color:var(--cobre);">editar</a>
+      </div>
+    `).join('')
+    : '<p>Nenhum fornecedor cadastrado ainda.</p>';
+
+  lista.querySelectorAll('.editar-fornecedor').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const fornecedor = FORNECEDORES_CACHE.find((f) => f.id_fornecedor === a.dataset.id);
+      if (fornecedor) preencherFormularioFornecedor(fornecedor);
+    });
+  });
+}
+
+document.getElementById('btn-novo-fornecedor').addEventListener('click', limparFormularioFornecedor);
 
 document.getElementById('btn-salvar-fornecedor').addEventListener('click', async () => {
   const dados = {
@@ -422,6 +566,8 @@ document.getElementById('btn-salvar-fornecedor').addEventListener('click', async
   };
   await apiCall('upsertFornecedor', dados);
   alert('Fornecedor salvo!');
+  limparFormularioFornecedor();
+  carregarCadastros();
 });
 
 async function carregarEstoqueBaixo() {
@@ -430,6 +576,21 @@ async function carregarEstoqueBaixo() {
   lista.innerHTML = produtos.length
     ? produtos.map((p) => `<div class="linha-item"><span>${p.nome_produto}</span><span>${p.qtd_estoque} restantes</span></div>`).join('')
     : '<p>Nenhum produto abaixo do estoque mínimo.</p>';
+}
+
+async function carregarCadastros() {
+  const [produtos, clientes, fornecedores] = await Promise.all([
+    apiCall('listProdutos'),
+    apiCall('listClientes'),
+    apiCall('listFornecedores')
+  ]);
+  PRODUTOS_CACHE = produtos;
+  CLIENTES_CACHE = clientes;
+  FORNECEDORES_CACHE = fornecedores;
+  renderListaProdutosCadastrados();
+  renderListaClientesCadastrados();
+  renderListaFornecedoresCadastrados();
+  carregarEstoqueBaixo();
 }
 
 // =====================================================
