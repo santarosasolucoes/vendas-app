@@ -1,6 +1,7 @@
 let PRODUTOS_CACHE = [];
 let CLIENTES_CACHE = [];
 let FORNECEDORES_CACHE = [];
+let CATEGORIAS_CACHE = [];
 let CARRINHO = []; // [{id_produto, nome_produto, quantidade, preco_venda}]
 let CARRINHO_COMPRA = []; // [{id_produto, nome_produto, quantidade, custo_unitario}]
 
@@ -385,6 +386,54 @@ function formatarDataParaInput(valor) {
   return valor ? String(valor).slice(0, 10) : '';
 }
 
+// --- Categoria ---
+function limparFormularioCategoria() {
+  document.getElementById('cat-id').value = '';
+  document.getElementById('cat-nome').value = '';
+  document.getElementById('titulo-form-categoria').textContent = 'Nova categoria';
+}
+
+function preencherFormularioCategoria(c) {
+  document.getElementById('cat-id').value = c.id_categoria;
+  document.getElementById('cat-nome').value = c.nome_categoria || '';
+  document.getElementById('titulo-form-categoria').textContent = 'Editar categoria';
+  document.getElementById('titulo-form-categoria').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderListaCategoriasCadastradas() {
+  const lista = document.getElementById('lista-categorias-cadastradas');
+  lista.innerHTML = CATEGORIAS_CACHE.length
+    ? CATEGORIAS_CACHE.map((c) => `
+      <div class="linha-item">
+        <span>${c.nome_categoria}</span>
+        <a href="#" data-id="${c.id_categoria}" class="editar-categoria" style="color:var(--cobre);">editar</a>
+      </div>
+    `).join('')
+    : '<p>Nenhuma categoria cadastrada ainda.</p>';
+
+  lista.querySelectorAll('.editar-categoria').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const categoria = CATEGORIAS_CACHE.find((c) => c.id_categoria === a.dataset.id);
+      if (categoria) preencherFormularioCategoria(categoria);
+    });
+  });
+}
+
+document.getElementById('btn-novo-categoria').addEventListener('click', limparFormularioCategoria);
+
+document.getElementById('btn-salvar-categoria').addEventListener('click', async () => {
+  const dados = {
+    id_categoria: document.getElementById('cat-id').value || undefined,
+    nome_categoria: document.getElementById('cat-nome').value
+  };
+  if (!dados.nome_categoria) return alert('Informe o nome da categoria.');
+  await apiCall('upsertCategoria', dados);
+  alert('Categoria salva!');
+  limparFormularioCategoria();
+  carregarCadastros();
+});
+
 // --- Produto ---
 function limparFormularioProduto() {
   document.getElementById('prod-id').value = '';
@@ -411,10 +460,18 @@ function preencherSelectFornecedorProduto() {
   select.value = selecionado;
 }
 
+function preencherSelectCategoriaProduto() {
+  const select = document.getElementById('prod-categoria');
+  const selecionado = select.value;
+  select.innerHTML = '<option value="">— Selecione —</option>' +
+    CATEGORIAS_CACHE.map((c) => `<option value="${c.id_categoria}">${c.nome_categoria}</option>`).join('');
+  select.value = selecionado;
+}
+
 function preencherFormularioProduto(p) {
   document.getElementById('prod-id').value = p.id_produto;
   document.getElementById('prod-nome').value = p.nome_produto || '';
-  document.getElementById('prod-categoria').value = p.categoria || '';
+  document.getElementById('prod-categoria').value = p.id_categoria || '';
   document.getElementById('prod-fornecedor').value = p.id_fornecedor || '';
   document.getElementById('prod-foto').value = p.foto_url || '';
   document.getElementById('prod-unid-compra').value = p.unidade_compra || '';
@@ -455,7 +512,7 @@ document.getElementById('btn-salvar-produto').addEventListener('click', async ()
   const dados = {
     id_produto: document.getElementById('prod-id').value || undefined,
     nome_produto: document.getElementById('prod-nome').value,
-    categoria: document.getElementById('prod-categoria').value,
+    id_categoria: document.getElementById('prod-categoria').value,
     id_fornecedor: document.getElementById('prod-fornecedor').value,
     foto_url: document.getElementById('prod-foto').value,
     unidade_compra: document.getElementById('prod-unid-compra').value,
@@ -590,15 +647,19 @@ async function carregarEstoqueBaixo() {
 }
 
 async function carregarCadastros() {
-  const [produtos, clientes, fornecedores] = await Promise.all([
+  const [produtos, clientes, fornecedores, categorias] = await Promise.all([
     apiCall('listProdutos'),
     apiCall('listClientes'),
-    apiCall('listFornecedores')
+    apiCall('listFornecedores'),
+    apiCall('listCategorias')
   ]);
   PRODUTOS_CACHE = produtos;
   CLIENTES_CACHE = clientes;
   FORNECEDORES_CACHE = fornecedores;
+  CATEGORIAS_CACHE = categorias;
   preencherSelectFornecedorProduto();
+  preencherSelectCategoriaProduto();
+  renderListaCategoriasCadastradas();
   renderListaProdutosCadastrados();
   renderListaClientesCadastrados();
   renderListaFornecedoresCadastrados();

@@ -3,7 +3,7 @@
 // texto puro (evita o preflight CORS que o Apps Script não responde) e, se falharem
 // por falta de rede, caem na fila de sincronização (idb-queue.js).
 const ACOES_LEITURA = new Set([
-  'getCatalogo', 'getConfigVendedor', 'listProdutos', 'listClientes', 'listFornecedores',
+  'getCatalogo', 'getConfigVendedor', 'listProdutos', 'listClientes', 'listFornecedores', 'listCategorias',
   'listPedidos', 'listVendas', 'listVendasPendentesVencidas', 'listProdutosEstoqueBaixo',
   'painelLucratividade', 'gerarTextoConfirmacaoPedido', 'gerarTextoNotinha',
   'gerarTextoCobranca', 'gerarTextoAgradecimento', 'gerarPixPayload',

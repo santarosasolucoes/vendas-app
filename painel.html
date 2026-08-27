@@ -109,12 +109,28 @@
   <section id="aba-cadastros" style="display:none;">
     <div class="cartao">
       <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="titulo-form-categoria">Nova categoria</h3>
+        <button type="button" id="btn-novo-categoria" class="secundario" style="min-height:36px; padding:6px 12px;">Novo</button>
+      </div>
+      <input type="hidden" id="cat-id">
+      <label>Nome</label><input id="cat-nome">
+      <button id="btn-salvar-categoria">Salvar categoria</button>
+    </div>
+
+    <div class="cartao">
+      <h3>Categorias cadastradas</h3>
+      <div id="lista-categorias-cadastradas"></div>
+    </div>
+
+    <div class="cartao">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
         <h3 id="titulo-form-produto">Novo produto</h3>
         <button type="button" id="btn-novo-produto" class="secundario" style="min-height:36px; padding:6px 12px;">Novo</button>
       </div>
       <input type="hidden" id="prod-id">
       <label>Nome</label><input id="prod-nome">
-      <label>Categoria</label><input id="prod-categoria">
+      <label>Categoria</label>
+      <select id="prod-categoria"><option value="">— Selecione —</option></select>
       <label>Fornecedor</label>
       <select id="prod-fornecedor"><option value="">— Selecione —</option></select>
       <label>Foto (URL)</label><input id="prod-foto">
