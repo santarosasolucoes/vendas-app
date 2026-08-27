@@ -73,8 +73,7 @@ async function carregarDadosPedido() {
 
   const selectProduto = document.getElementById('select-produto');
   selectProduto.innerHTML = PRODUTOS_CACHE
-    .filter((p) => Number(p.qtd_estoque) > 0)
-    .map((p) => `<option value="${p.id_produto}">${p.nome_produto} (${formatarMoedaLocal(p.preco_venda)})</option>`)
+    .map((p) => `<option value="${p.id_produto}">${p.nome_produto} (${formatarMoedaLocal(p.preco_venda)})${Number(p.qtd_estoque) <= 0 ? ' — sob encomenda' : ''}</option>`)
     .join('');
 }
 
