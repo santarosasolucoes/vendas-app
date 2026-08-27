@@ -8,6 +8,31 @@ function formatarMoedaLocal(valor) {
   return 'R$ ' + Number(valor || 0).toFixed(2).replace('.', ',');
 }
 
+// --- compartilhar o link do catálogo ---
+document.getElementById('btn-compartilhar-catalogo').addEventListener('click', async () => {
+  const urlCatalogo = new URL('catalogo.html', location.href).href;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Catálogo Empório RD',
+        text: 'Confira nosso catálogo, com preços sempre atualizados:',
+        url: urlCatalogo
+      });
+    } catch (err) {
+      // usuário cancelou o compartilhamento — não é erro, não faz nada
+    }
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(urlCatalogo);
+    alert('Link do catálogo copiado! Já pode colar e enviar pelo WhatsApp.');
+  } catch (err) {
+    prompt('Copie o link do catálogo abaixo:', urlCatalogo);
+  }
+});
+
 // --- navegação entre abas ---
 document.querySelectorAll('nav.abas button').forEach((btn) => {
   btn.addEventListener('click', () => {
