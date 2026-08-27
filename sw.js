@@ -2,7 +2,7 @@
 // (catálogo, listas), para que o app funcione mesmo sem internet. Requisições POST
 // (escritas) nunca são interceptadas aqui — se falharem, quem trata é o api.js,
 // enfileirando em idb-queue.js.
-const CACHE_NAME = 'vendas-cache-v1';
+const CACHE_NAME = 'vendas-cache-v2';
 const APP_SHELL = [
   './painel.html',
   './catalogo.html',
@@ -39,7 +39,11 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return; // POST segue direto pra rede, sem passar pelo cache
 
   event.respondWith(
-    fetch(req)
+    // cache: 'no-store' força ignorar o cache HTTP do próprio navegador (não só o
+    // nosso, o do Chrome) — sem isso, o Chrome às vezes serve uma cópia antiga da
+    // rede sem a gente perceber, mesmo com internet disponível, e as atualizações
+    // do app demoram a aparecer pro usuário.
+    fetch(req, { cache: 'no-store' })
       .then((res) => {
         const copia = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(req, copia));
