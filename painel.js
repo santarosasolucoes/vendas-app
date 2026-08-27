@@ -390,6 +390,7 @@ function limparFormularioProduto() {
   document.getElementById('prod-id').value = '';
   document.getElementById('prod-nome').value = '';
   document.getElementById('prod-categoria').value = '';
+  document.getElementById('prod-fornecedor').value = '';
   document.getElementById('prod-foto').value = '';
   document.getElementById('prod-unid-compra').value = '';
   document.getElementById('prod-custo-compra').value = '';
@@ -402,10 +403,19 @@ function limparFormularioProduto() {
   document.getElementById('titulo-form-produto').textContent = 'Novo produto';
 }
 
+function preencherSelectFornecedorProduto() {
+  const select = document.getElementById('prod-fornecedor');
+  const selecionado = select.value;
+  select.innerHTML = '<option value="">— Selecione —</option>' +
+    FORNECEDORES_CACHE.map((f) => `<option value="${f.id_fornecedor}">${f.nome_fabrica}</option>`).join('');
+  select.value = selecionado;
+}
+
 function preencherFormularioProduto(p) {
   document.getElementById('prod-id').value = p.id_produto;
   document.getElementById('prod-nome').value = p.nome_produto || '';
   document.getElementById('prod-categoria').value = p.categoria || '';
+  document.getElementById('prod-fornecedor').value = p.id_fornecedor || '';
   document.getElementById('prod-foto').value = p.foto_url || '';
   document.getElementById('prod-unid-compra').value = p.unidade_compra || '';
   document.getElementById('prod-custo-compra').value = p.preco_custo_unidade_compra || '';
@@ -424,7 +434,7 @@ function renderListaProdutosCadastrados() {
   lista.innerHTML = PRODUTOS_CACHE.length
     ? PRODUTOS_CACHE.map((p) => `
       <div class="linha-item">
-        <span>${p.nome_produto} — ${formatarMoedaLocal(p.preco_venda)} (${p.qtd_estoque} em estoque)</span>
+        <span><strong>${p.categoria || 'Sem categoria'}</strong> — ${p.nome_produto} — ${formatarMoedaLocal(p.preco_venda)} (${p.qtd_estoque} em estoque)${p.id_fornecedor ? ' — ' + nomeFornecedorLocal(p.id_fornecedor) : ''}</span>
         <a href="#" data-id="${p.id_produto}" class="editar-produto" style="color:var(--cobre);">editar</a>
       </div>
     `).join('')
@@ -446,6 +456,7 @@ document.getElementById('btn-salvar-produto').addEventListener('click', async ()
     id_produto: document.getElementById('prod-id').value || undefined,
     nome_produto: document.getElementById('prod-nome').value,
     categoria: document.getElementById('prod-categoria').value,
+    id_fornecedor: document.getElementById('prod-fornecedor').value,
     foto_url: document.getElementById('prod-foto').value,
     unidade_compra: document.getElementById('prod-unid-compra').value,
     preco_custo_unidade_compra: document.getElementById('prod-custo-compra').value,
@@ -587,6 +598,7 @@ async function carregarCadastros() {
   PRODUTOS_CACHE = produtos;
   CLIENTES_CACHE = clientes;
   FORNECEDORES_CACHE = fornecedores;
+  preencherSelectFornecedorProduto();
   renderListaProdutosCadastrados();
   renderListaClientesCadastrados();
   renderListaFornecedoresCadastrados();
